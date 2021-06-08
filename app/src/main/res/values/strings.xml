@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">VK video loader</string>
+    <integer name="com_vk_sdk_AppId">7874118</integer>
+</resources>
