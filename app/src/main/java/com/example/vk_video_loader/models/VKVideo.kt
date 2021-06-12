@@ -1,4 +1,4 @@
-package com.example.vk_video_loader
+package com.example.vk_video_loader.models
 
 import android.os.Parcel
 import android.os.Parcelable

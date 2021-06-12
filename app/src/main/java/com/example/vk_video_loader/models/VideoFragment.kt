@@ -7,8 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.vk_video_loader.activities.VideoDetailsActivity
 
-data class VideoFragment (var name: String, var description: String, var potw : Boolean, var repeat: Boolean, var compress: Boolean) {}
+data class VideoFragment (var name: String, var description: String, var potw : Boolean, var repeat: Boolean, var compress: Boolean, var status: Int)
 
 class VideoFragmentAdapter(private val context: Context, private val videoFragmentsList: MutableList<VideoFragment>):
     RecyclerView.Adapter<VideoFragmentAdapter.VideoFragmentHolder>() {
@@ -19,6 +20,7 @@ class VideoFragmentAdapter(private val context: Context, private val videoFragme
             var potw_txt: TextView = itemView.findViewById(R.id.fragment_potw)
             var repeat_txt: TextView = itemView.findViewById(R.id.fragment_repeat)
             var compress_txt: TextView = itemView.findViewById(R.id.fragment_compress)
+            var status_txt: TextView = itemView.findViewById(R.id.fragment_status)
 
             fun bind() {
                 itemView.setOnClickListener {
@@ -28,6 +30,7 @@ class VideoFragmentAdapter(private val context: Context, private val videoFragme
                     intent.putExtra("video_potw", potw_txt.text)
                     intent.putExtra("video_repeat", repeat_txt.text)
                     intent.putExtra("video_compress", compress_txt.text)
+                    intent.putExtra("status", status_txt.text)
                     it.context.startActivity(intent)
                 }
             }
@@ -49,6 +52,12 @@ class VideoFragmentAdapter(private val context: Context, private val videoFragme
         holder.potw_txt.text = listItem.potw.toString()
         holder.repeat_txt.text = listItem.repeat.toString()
         holder.compress_txt.text = listItem.compress.toString()
+        when (listItem.status) {
+            1 -> holder.status_txt.text = "Loading"
+            2 -> holder.status_txt.text = "Loaded"
+            0 -> holder.status_txt.text = "Paused"
+            -1 -> holder.status_txt.text = "Cancelled"
+        }
     }
 
 }

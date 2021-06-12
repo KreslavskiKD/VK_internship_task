@@ -1,4 +1,4 @@
-package com.example.vk_video_loader
+package com.example.vk_video_loader.activities
 
 import android.Manifest
 import android.app.Activity
@@ -12,21 +12,17 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.vk_video_loader.*
+import com.example.vk_video_loader.utilities.URIPathHelper
 import com.vk.api.sdk.VK
-import com.vk.api.sdk.VKApiCallback
 import com.vk.api.sdk.VKTokenExpiredHandler
-import com.vk.api.sdk.auth.VKAccessToken
-import com.vk.api.sdk.auth.VKAuthCallback
-import com.vk.api.sdk.auth.VKScope
-import com.vk.api.sdk.ui.VKConfirmationActivity
-import kotlin.system.exitProcess
+
 
 class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
     lateinit var video_name : String
@@ -34,13 +30,13 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
     var post_on_the_wall : Boolean = false
     var video_repeat : Boolean = false
     var video_compression : Boolean = false
+    var video_status: Int = 1
 
     var listOfVideos: MutableList<VideoFragment> = mutableListOf()
     var adapter: VideoFragmentAdapter = VideoFragmentAdapter(this, listOfVideos)
     lateinit var layoutManager: LinearLayoutManager
     lateinit var recyclerView : RecyclerView
     var REQUEST_CODE = 1
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,11 +71,11 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
     }
 
     override fun onDialogPositiveClick(
-        name: String,
-        description: String,
-        potw: Boolean,
-        repeat: Boolean,
-        compression: Boolean
+            name: String,
+            description: String,
+            potw: Boolean,
+            repeat: Boolean,
+            compression: Boolean
     ) {
         setVideoName(name)
         setVideoDescription(description)
@@ -87,41 +83,35 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
         setRepeat(repeat)
         setVideoCompression(compression)
 
-        listOfVideos.add(VideoFragment(video_name, video_description, post_on_the_wall, video_repeat, video_compression))
-
-        adapter = VideoFragmentAdapter(baseContext, listOfVideos)
-        recyclerView.adapter = adapter
-        adapter.notifyDataSetChanged()
-
 
         val intent = Intent()
         intent.type = "video/*"
         intent.action = Intent.ACTION_PICK
         if (!isPermissionsAllowed()) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this as Activity,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
+                            this as Activity,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
             ) {
                 AlertDialog.Builder(this)
-                    .setTitle("Permission Denied")
-                    .setMessage("Permission is denied, Please allow permissions from App Settings.")
-                    .setPositiveButton("App Settings",
-                        DialogInterface.OnClickListener { dialogInterface, i ->
-                            // send to app settings if permission is denied permanently
-                            val intent = Intent()
-                            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            val uri = Uri.fromParts("package", getPackageName(), null)
-                            intent.data = uri
-                            startActivity(intent)
-                        })
-                    .setNegativeButton("Cancel",null)
-                    .show()
+                        .setTitle("Permission Denied")
+                        .setMessage("Permission is denied, Please allow permissions from App Settings.")
+                        .setPositiveButton("App Settings",
+                                DialogInterface.OnClickListener { dialogInterface, i ->
+                                    // send to app settings if permission is denied permanently
+                                    val intent = Intent()
+                                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                    val uri = Uri.fromParts("package", getPackageName(), null)
+                                    intent.data = uri
+                                    startActivity(intent)
+                                })
+                        .setNegativeButton("Cancel",null)
+                        .show()
             } else {
                 ActivityCompat.requestPermissions(
-                    this as Activity,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    REQUEST_CODE
+                        this as Activity,
+                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        REQUEST_CODE
                 )
             }
         } else {
@@ -135,17 +125,21 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE) {
             if (data?.data != null) {
                 val uriPathHelper = URIPathHelper()
-                val videoFullPath = uriPathHelper.getPath(this, data.data!!)!!
-                VK.execute(VKVideoSaveRequest(video_name, video_description, post_on_the_wall, video_repeat, video_compression), object: VKApiCallback<String> {
-                    override fun success(result: String) {
-                        UploadUtility(this@MainActivity).uploadFile(videoFullPath, result)
+                val intent = Intent(this, VideoDetailsActivity::class.java)
+                intent.putExtra("video_name", video_name)
+                intent.putExtra("video_description", video_description)
+                intent.putExtra("video_potw", post_on_the_wall)
+                intent.putExtra("video_repeat", video_repeat)
+                intent.putExtra("video_compress", video_compression)
+                intent.putExtra("status", video_status)
+                intent.putExtra("source_file_path", uriPathHelper.getPath(this, data.data!!)!!)
 
-                    }
+                listOfVideos.add(VideoFragment(video_name, video_description, post_on_the_wall, video_repeat, video_compression, video_status))
+                adapter = VideoFragmentAdapter(baseContext, listOfVideos)
+                recyclerView.adapter = adapter
+                adapter.notifyDataSetChanged()
 
-                    override fun fail(error: Exception) {
-                        Log.e(TAG, error.toString())
-                    }
-                })
+                this.startActivity(intent)
             }
         }
     }
@@ -159,7 +153,7 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
 
 
     override fun onDialogNegativeClick() {
-        TODO("Not yet sure what to do here")
+
     }
 
     fun setVideoName(name: String) { video_name = name }
@@ -170,7 +164,7 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
 
 
     fun isPermissionsAllowed() =
-        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
 
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) {
@@ -199,4 +193,5 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
             context.startActivity(intent)
         }
     }
+
 }

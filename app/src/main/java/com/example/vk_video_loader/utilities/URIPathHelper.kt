@@ -1,4 +1,4 @@
-package com.example.vk_video_loader
+package com.example.vk_video_loader.utilities
 
 import android.content.ContentUris
 import android.content.Context

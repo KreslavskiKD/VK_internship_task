@@ -36,7 +36,7 @@ class VKVideoSaveRequest(private val name: String? = null,
         }
 
         description?.let {
-            callBuilder.args("name", it)
+            callBuilder.args("description", it)
         }
 
         return manager.execute(callBuilder.build(), ResponseApiParser())

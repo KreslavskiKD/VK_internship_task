@@ -1,48 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".VideoDetailsActivity"
+    tools:context=".activities.VideoDetailsActivity"
     android:theme="@style/Theme.AppCompat">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/video_name"
-            android:textStyle="bold">
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activity_video_name"
+                tools:text="@tools:sample/lorem[1]]"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:textStyle="bold"/>
 
-        </TextView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activity_video_description"
+                tools:text="@tools:sample/lorem[3]]"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"/>
+        </LinearLayout>
+
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
+            android:orientation="vertical">
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/video_length">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/activity_video_potw_static"
+                    android:text="W"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"/>
 
-            </TextView>
-            <TextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/activity_video_potw"
+                    tools:text="@tools:sample/lorem[2]]"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"/>
+            </LinearLayout>
+
+
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/video_upload_time">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/activity_video_repeat_static"
+                    android:text="R"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"/>
 
-            </TextView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/activity_video_repeat"
+                    tools:text="@tools:sample/lorem[2]]"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/activity_video_compress_static"
+                    android:text="C"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/activity_video_compress"
+                    tools:text="@tools:sample/lorem[2]]"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"/>
+            </LinearLayout>
+
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/activity_video_status"
+            tools:text="@tools:sample/lorem[2]]"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
+
+        </TextView>
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -50,15 +125,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:src="@android:drawable/ic_media_play"
+        android:src="@android:drawable/ic_media_pause"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
 
     <ProgressBar
         android:id="@+id/progressBar3"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="100dp"
         android:layout_centerInParent="true"/>
 
     <Button
@@ -67,7 +142,8 @@
         android:id="@+id/cancel_btn"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="CANCEL">
+        android:text="CANCEL"
+        android:onClick="onCancelButton">
 
     </Button>
 

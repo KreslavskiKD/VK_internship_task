@@ -1,12 +1,12 @@
-package com.example.vk_video_loader
+package com.example.vk_video_loader.activities
 
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import com.example.vk_video_loader.R
 import com.vk.api.sdk.VK
-import com.vk.api.sdk.VKTokenExpiredHandler
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
 import com.vk.api.sdk.auth.VKScope
