@@ -9,9 +9,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import android.widget.Button
+import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -19,34 +21,72 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.vk_video_loader.*
+import com.example.vk_video_loader.models.ProgramState
 import com.example.vk_video_loader.utilities.URIPathHelper
+import com.google.gson.Gson
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.VKTokenExpiredHandler
+import java.io.BufferedReader
+import java.io.File
+import java.lang.Exception
+
+const val LOADING: Int = 1
+const val LOADED: Int = 2
+const val PAUSED: Int = 3
+const val CANCELLED: Int = -1
 
 
 class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
+    var program_mode: Boolean = false
     lateinit var video_name : String
     lateinit var video_description : String
     var post_on_the_wall : Boolean = false
     var video_repeat : Boolean = false
     var video_compression : Boolean = false
-    var video_status: Int = 1
+    var video_status: Int = 0
+    var hml = 0L
 
     var listOfVideos: MutableList<VideoFragment> = mutableListOf()
     var adapter: VideoFragmentAdapter = VideoFragmentAdapter(this, listOfVideos)
     lateinit var layoutManager: LinearLayoutManager
     lateinit var recyclerView : RecyclerView
+    lateinit var checkBox: CheckBox
     var REQUEST_CODE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+//        var programState = ProgramState(program_mode,
+//            video_status, 0L, video_name, video_description, post_on_the_wall, video_repeat, video_compression, listOfVideos)
+        var gson = Gson()
+        val bufferedReader : BufferedReader
+        //// todo add permission asking for WRITE_EXTERNAL_STORAGE
+
+        var temp_file = File(this.cacheDir.toString() + "data.txt")
+        if (temp_file.exists()) {
+            bufferedReader = File(this.cacheDir.toString() + "data.txt").bufferedReader()
+            val inputString = bufferedReader.use { it.readText() }
+            var programState = gson.fromJson(inputString, ProgramState::class.java)
+            if (programState != null) {
+                program_mode = programState.upload_mode
+                video_status = programState.last_load_state
+                listOfVideos = programState.videos
+            }
+        } else {
+            var file = File(this.cacheDir.toString() + "data.txt")
+            file.createNewFile()
+//            file.writeText(gson.toJson(programState))
+        }
+
+        checkBox = findViewById(R.id.check_type_box)
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = layoutManager
+        adapter = VideoFragmentAdapter(baseContext, listOfVideos)
         recyclerView.adapter = adapter
+        adapter.notifyDataSetChanged()
 
         VK.addTokenExpiredHandler(tokenTracker)
 
@@ -58,6 +98,7 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
         }
 
         val uploadBtn : Button = findViewById(R.id.upload_button)
+        program_mode = checkBox.isChecked
         uploadBtn.setOnClickListener {
 
             Log.d("uploadBtn", "Entered onClick method")
@@ -133,6 +174,7 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
                 intent.putExtra("video_compress", video_compression)
                 intent.putExtra("status", video_status)
                 intent.putExtra("source_file_path", uriPathHelper.getPath(this, data.data!!)!!)
+                intent.putExtra("uploading_mode", program_mode)
 
                 listOfVideos.add(VideoFragment(video_name, video_description, post_on_the_wall, video_repeat, video_compression, video_status))
                 adapter = VideoFragmentAdapter(baseContext, listOfVideos)
@@ -150,7 +192,6 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
             // token expired
         }
     }
-
 
     override fun onDialogNegativeClick() {
 
@@ -194,4 +235,31 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        program_mode = checkBox.isChecked
+        var gson = Gson()
+        var file = File(this.cacheDir.toString() + "data.txt")
+        var programState = ProgramState(program_mode, video_status, hml, video_name, video_description, post_on_the_wall, video_repeat, video_compression, listOfVideos)
+        file.writeText(gson.toJson(programState))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        var gson = Gson()
+        val bufferedReader : BufferedReader
+
+        var temp_dir = File(this.cacheDir.toString() + "data.txt")
+        if (temp_dir.exists()) {
+            bufferedReader = File(this.cacheDir.toString() + "data.txt").bufferedReader()
+            val inputString = bufferedReader.use { it.readText() }
+            var programState = gson.fromJson(inputString, ProgramState::class.java)
+            if (programState != null) {
+                program_mode = programState.upload_mode
+                video_status = programState.last_load_state
+                listOfVideos = programState.videos
+                hml = programState.how_much_loaded
+            }
+        }
+    }
 }

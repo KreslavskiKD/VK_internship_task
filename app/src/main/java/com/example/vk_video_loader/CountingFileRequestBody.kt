@@ -10,7 +10,8 @@ import java.io.IOException
 
 class CountingFileRequestBody(private val file: File,
                               private val contentType: String,
-                              private val listener: ProgressListener
+                              private val listener: ProgressListener,
+                              private val offset: Long
 ) :
     RequestBody() {
     override fun contentLength(): Long {
@@ -34,7 +35,7 @@ class CountingFileRequestBody(private val file: File,
                 ).also { read = it } != -1L
             ) {
                 total += read
-                sink.flush()
+                if (total >= offset) sink.flush()
                 listener.transferred(total)
             }
         } finally {
