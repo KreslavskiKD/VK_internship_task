@@ -81,11 +81,14 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
         }
 
         checkBox = findViewById(R.id.check_type_box)
+
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.setHasFixedSize(true)
+
         layoutManager = LinearLayoutManager(this)
         adapter = VideoFragmentAdapter(baseContext, listOfVideos)
         recyclerView.adapter = adapter
+        recyclerView.layoutManager = layoutManager
         adapter.notifyDataSetChanged()
 
         VK.addTokenExpiredHandler(tokenTracker)
@@ -176,7 +179,7 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
                 intent.putExtra("source_file_path", uriPathHelper.getPath(this, data.data!!)!!)
                 intent.putExtra("uploading_mode", program_mode)
 
-                listOfVideos.add(VideoFragment(video_name, video_description, post_on_the_wall, video_repeat, video_compression, video_status))
+                listOfVideos.add(VideoFragment(video_name, video_description, post_on_the_wall, video_repeat, video_compression))
                 adapter = VideoFragmentAdapter(baseContext, listOfVideos)
                 recyclerView.adapter = adapter
                 adapter.notifyDataSetChanged()
@@ -199,7 +202,7 @@ class MainActivity : AppCompatActivity(), VideoDialogReturnInterface {
 
     fun setVideoName(name: String) { video_name = name }
     fun setVideoDescription(description: String) { video_description = description }
-    fun setPOTW(post: Boolean) { post_on_the_wall = post}  /// next 3 lines can be upgraded to 1.5.0 Kotlin standard if allowed
+    fun setPOTW(post: Boolean) { post_on_the_wall = post}
     fun setRepeat(repeat: Boolean) { video_repeat = repeat }
     fun setVideoCompression(compression: Boolean) { video_compression = compression}
 

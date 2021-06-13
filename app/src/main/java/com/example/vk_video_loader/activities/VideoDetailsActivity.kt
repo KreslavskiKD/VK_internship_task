@@ -183,6 +183,7 @@ class VideoDetailsActivity : AppCompatActivity(), CountingFileRequestBody.Progre
             progress_bar.visibility = View.GONE
             play_btn.hide()
             statusTextView.text = "Cancelled"
+            transferredYetData = 0
         }
     }
 

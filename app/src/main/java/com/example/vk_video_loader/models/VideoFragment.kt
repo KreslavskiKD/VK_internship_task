@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.vk_video_loader.activities.VideoDetailsActivity
 
-data class VideoFragment (var name: String, var description: String, var potw : Boolean, var repeat: Boolean, var compress: Boolean, var status: Int)
+data class VideoFragment (var name: String, var description: String, var potw : Boolean, var repeat: Boolean, var compress: Boolean)
 
 class VideoFragmentAdapter(private val context: Context, private val videoFragmentsList: MutableList<VideoFragment>):
     RecyclerView.Adapter<VideoFragmentAdapter.VideoFragmentHolder>() {
@@ -52,12 +52,12 @@ class VideoFragmentAdapter(private val context: Context, private val videoFragme
         holder.potw_txt.text = listItem.potw.toString()
         holder.repeat_txt.text = listItem.repeat.toString()
         holder.compress_txt.text = listItem.compress.toString()
-        when (listItem.status) {
-            1 -> holder.status_txt.text = "Loading"
-            2 -> holder.status_txt.text = "Loaded"
-            0 -> holder.status_txt.text = "Paused"
-            -1 -> holder.status_txt.text = "Cancelled"
-        }
+//        when (listItem.status) {
+//            1 -> holder.status_txt.text = "Loading"
+//            2 -> holder.status_txt.text = "Loaded"
+//            0 -> holder.status_txt.text = "Paused"
+//            -1 -> holder.status_txt.text = "Cancelled"
+//        }
     }
 
 }
